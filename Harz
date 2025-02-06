@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standortfreigabe</title>
+</head>
+<body>
+    <h2>Bitte teilen Sie Ihren Standort</h2>
+    <button onclick="getLocation()">Standort senden</button>
+    <p id="message"></p>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                document.getElementById("message").innerHTML = "Geolocation wird nicht unterstützt.";
+            }
+        }
+
+        function sendLocation(position) {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+
+            // Sende den Standort an deine E-Mail oder eine Datenbank
+            fetch("https://api.webhook.site/dein-webhook-url", {  // Webhook einfügen
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ latitude: lat, longitude: lon })
+            });
+
+            document.getElementById("message").innerHTML = "Standort erfolgreich gesendet!";
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("message").innerHTML = "Sie haben den Zugriff verweigert.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("message").innerHTML = "Standort nicht verfügbar.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("message").innerHTML = "Zeitüberschreitung.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("message").innerHTML = "Ein unbekannter Fehler ist aufgetreten.";
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
